@@ -186,3 +186,56 @@ exports.getParcelsByDateRange = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 }
+exports.createParcel = async (req, res) => {
+  try {
+    const {
+      recipientName,
+      recipientPhone,
+      pickupPoint,
+      destination,
+      size,
+      weightKg,
+      vehicle,
+      amount,
+    } = req.body;
+
+    const wallet = await Wallet.findOne({ user: req.user._id });
+    if (!wallet || wallet.balance < amount) {
+      return res.status(400).json({ message: "Insufficient wallet balance" });
+    }
+
+    // Deduct from wallet
+    wallet.balance -= amount;
+    await wallet.save();
+
+    // Log the transaction
+    await Transaction.create({
+      wallet: wallet._id,
+      type: "payment",
+      amount,
+      method: "system",
+      reference: `parcel-${Date.now()}`,
+    });
+
+    const parcel = new Parcel({
+      sender: req.user._id,
+      recipientName,
+      recipientPhone,
+      pickupPoint,
+      destination,
+      size,
+      weightKg,
+      vehicle,
+      amount,
+    });
+
+    await parcel.save();
+    res
+      .status(201)
+      .json({ message: "Parcel booked and paid successfully", parcel });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Parcel booking failed", error: err.message });
+  }
+};
