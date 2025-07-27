@@ -9,8 +9,9 @@ const vehicleSchema = new mongoose.Schema({
     insuranceNumber: { type: String, unique: true },
     insuranceExpiryDate: Date,
 
-
-    plateNumber: { type: String, unique: true },
+routeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Route' },
+  seatMap: [[{ seatNumber: String, isBooked: Boolean }]],
+  plateNumber: { type: String, unique: true },
 
     capacity: Number,
     status: { type: String, enum: ['available', 'inUse', 'maintenance', 'retired'], default: 'available' },

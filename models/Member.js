@@ -36,6 +36,22 @@ const memberSchema = new mongoose.Schema(
       enum: ["active", "inactive", "pending", "suspended"],
       default: "active",
     },
+    behaviorScore: { type: Number, default: 0 },
+  walletBalance: { type: Number, default: 0 },
+  incomeSources: [{
+    source: String,
+    monthlyEstimate: Number
+  }],
+  chamaMemberships: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chama' }],
+    savings: { type: Number, default: 0 },
+    loans: [{
+      amount: Number,
+      interestRate: Number,
+      status: { type: String, enum: ['pending', 'approved', 'rejected', 'paid'], default: 'pending' },
+      repaymentDate: Date,
+      createdAt: { type: Date, default: Date.now }
+    }],
+    savingsGoal: { type: Number, default: 0 },
     points: { type: Number, default: 0 },
     behaviorScore: { type: Number, default: 0 },
     role: {
